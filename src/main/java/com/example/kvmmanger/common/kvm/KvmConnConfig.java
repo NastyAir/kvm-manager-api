@@ -1,0 +1,13 @@
+package com.example.kvmmanger.common.kvm;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class KvmConnConfig {
+    private String serverIP;
+
+}
