@@ -1,5 +1,7 @@
 package com.example.kvmmanger.common.kvm;
 
+import com.example.kvmmanger.common.contant.RetCode;
+import com.example.kvmmanger.common.exception.BusinessException;
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.libvirt.Connect;
 import org.springframework.beans.factory.InitializingBean;

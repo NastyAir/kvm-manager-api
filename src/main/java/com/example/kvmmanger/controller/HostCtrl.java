@@ -5,12 +5,14 @@ import com.example.kvmmanger.entity.Host;
 import com.example.kvmmanger.service.HostService;
 import com.example.kvmmanger.service.KvmService;
 import io.swagger.annotations.ApiOperation;
+import org.libvirt.LibvirtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 
 @CrossOrigin
 @RestController
@@ -44,7 +46,26 @@ public class HostCtrl {
     public ResponseEntity add(@RequestBody @Valid Host host) {
         Result message = hostService.add(host);
         return new ResponseEntity<>(message, HttpStatus.OK);
+    }
 
+    @ApiOperation(value = "更新主机", notes = "", response = ResponseEntity.class, tags = {"host"})
+    @PutMapping("/{id}")
+    public ResponseEntity update(@RequestBody @Valid Host host, @NotBlank(message = "id不能为空") @PathVariable Integer id) {
+        Result message = hostService.update(host, id);
+        return new ResponseEntity<>(message, HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "删除主机", notes = "", response = ResponseEntity.class, tags = {"host"})
+    @DeleteMapping("/{id}")
+    public ResponseEntity del(@NotBlank(message = "id不能为空") @PathVariable Integer id) {
+        Result message = hostService.del(id);
+        return new ResponseEntity<>(message, HttpStatus.OK);
+    }
+    @ApiOperation(value = "主机详情", notes = "", response = ResponseEntity.class, tags = {"host"})
+    @GetMapping("/{id}")
+    public ResponseEntity get(@NotBlank(message = "id不能为空") @PathVariable Integer id) throws LibvirtException {
+        Result message = hostService.get(id);
+        return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
 }
