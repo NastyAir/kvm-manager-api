@@ -1,7 +1,7 @@
 package com.example.kvmmanger.service;
 
-import com.example.kvmmanger.common.RestMessage;
-import com.example.kvmmanger.common.util.RestMessageUtil;
+import com.example.kvmmanger.common.Result;
+import com.example.kvmmanger.common.util.RetResponse;
 import com.example.kvmmanger.entity.Host;
 import com.example.kvmmanger.repository.HostRepository;
 import org.apache.commons.lang3.StringUtils;
@@ -30,7 +30,7 @@ public class HostService {
         this.hostRepository = hostRepository;
     }
 
-    public RestMessage list(String hostName, String order, String orderColumn, String currentPage, String pageSize) {
+    public Result list(String hostName, String order, String orderColumn, String currentPage, String pageSize) {
         //设置排序
         Sort.Direction direction = "ASC".equals(order.toUpperCase()) ? Sort.Direction.ASC : Sort.Direction.DESC;
         //设置分页
@@ -47,6 +47,11 @@ public class HostService {
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
         Page page = hostRepository.findAll(specification, pageable);
-        return RestMessageUtil.success(page);
+        return  RetResponse.success(page);
+    }
+
+    public Result add(Host host) {
+        Host savedHost = hostRepository.save(host);
+        return RetResponse.success(savedHost);
     }
 }
