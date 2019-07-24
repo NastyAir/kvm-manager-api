@@ -50,7 +50,8 @@ public class HostCtrl {
 
     @ApiOperation(value = "更新主机", notes = "", response = ResponseEntity.class, tags = {"host"})
     @PutMapping("/{id}")
-    public ResponseEntity update(@RequestBody @Valid Host host, @NotBlank(message = "id不能为空") @PathVariable Integer id) {
+    public ResponseEntity update(@RequestBody @Valid Host host,
+                                 @NotBlank(message = "id不能为空") @PathVariable Integer id) {
         Result message = hostService.update(host, id);
         return new ResponseEntity<>(message, HttpStatus.OK);
     }

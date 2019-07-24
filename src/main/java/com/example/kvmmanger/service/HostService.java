@@ -61,6 +61,7 @@ public class HostService {
     }
 
     public Result add(Host host) {
+        host.setId(null);
         Host savedHost = hostRepository.save(host);
         return RetResponse.success(savedHost);
     }
