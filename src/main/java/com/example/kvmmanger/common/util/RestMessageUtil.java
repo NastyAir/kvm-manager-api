@@ -4,6 +4,8 @@ import com.example.kvmmanger.common.RestMessage;
 import com.example.kvmmanger.common.contant.CodeConstant;
 import org.springframework.http.ResponseEntity;
 
+import java.util.Objects;
+
 public class RestMessageUtil {
     public static RestMessage success(Object object) {
         RestMessage restMessage = new RestMessage();
@@ -29,7 +31,7 @@ public class RestMessageUtil {
 
     public static RestMessage from(ResponseEntity<RestMessage> responseMessage) {
         RestMessage msg = new RestMessage();
-        msg.setCode(responseMessage.getBody().getCode());
+        msg.setCode(Objects.requireNonNull(responseMessage.getBody()).getCode());
         if (responseMessage.getBody().getMsg() != null) {
             msg.setMsg(responseMessage.getBody().getMsg());
         }
