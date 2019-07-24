@@ -1,11 +1,11 @@
 package com.example.kvmmanger.service;
 
-import com.example.kvmmanger.common.RestMessage;
+import com.example.kvmmanger.common.Result;
 import org.springframework.stereotype.Service;
 
 @Service
 public class KvmService {
-    public RestMessage getNodeInfo() {
+    public Result getNodeInfo() {
         return null;
     }
 

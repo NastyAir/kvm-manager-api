@@ -1,7 +1,7 @@
 package com.example.kvmmanger.common.contant;
 
 
-public enum CodeConstant {
+public enum RetCode {
     SUCCESS("成功", 1),
     FAIL("未知错误", 2),
     RECORD_NOT_FOUND("目标未找到", 3),
@@ -12,13 +12,13 @@ public enum CodeConstant {
     private String text;
     private int code;
 
-    CodeConstant(String text, int code) {
+    RetCode(String text, int code) {
         this.text = text;
         this.code = code;
     }
 
     public static String getText(int code) {
-        for (CodeConstant c : CodeConstant.values()) {
+        for (RetCode c : RetCode.values()) {
             if (c.getCode() == code) {
                 return c.text;
             }
