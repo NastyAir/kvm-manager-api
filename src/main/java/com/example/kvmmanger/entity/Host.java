@@ -7,9 +7,9 @@ import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Null;
 
 
 @Data
@@ -18,7 +18,7 @@ import javax.validation.constraints.Null;
 @Entity
 public class Host {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @NotBlank(message = "名称不能为空")
     @Length(max = 50,message = "名称长度不能超过50")
