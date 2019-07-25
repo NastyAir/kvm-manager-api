@@ -2,11 +2,15 @@ package com.example.kvmmanger.common.contant;
 
 
 public enum RetCode {
-    SUCCESS("成功", 1),
-    FAIL("未知错误", 2),
-    RECORD_NOT_FOUND("目标未找到", 3),
-    RECORD_ALREADY_EXISTS("目标已存在", 4),
-    PARAMETER_ERROR("参数错误", 5),
+    SUCCESS("成功", 1001),
+    FAIL("未知错误", 1002),
+    RECORD_NOT_FOUND("目标未找到", 1003),
+    RECORD_ALREADY_EXISTS("目标已存在", 1004),
+    PARAMETER_ERROR("参数错误", 1005),
+
+    AUTH_INVALIDATION("登录已失效，请重新登录", 601),
+    AUTH_FAIL("认证失败", 601),
+    AUTH_NO_ACCESS("抱歉，您没有访问权限", 603),
     ;
 
     private String text;

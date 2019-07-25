@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 
-@CrossOrigin
+//@CrossOrigin
 @RestController
-@RequestMapping("/host")
+@RequestMapping("/api/host")
 public class HostCtrl {
 
     private final KvmService kvmService;

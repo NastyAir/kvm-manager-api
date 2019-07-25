@@ -13,6 +13,10 @@ public class RetResponse {
         return new Result<T>().setCode(RetCode.SUCCESS.getCode()).setMsg(message);
     }
 
+    public static <T> Result<T> success(String message, T data) {
+        return new Result<T>().setCode(RetCode.SUCCESS.getCode()).setMsg(message).setResult(data);
+    }
+
     public static <T> Result<T> success(T data) {
         return new Result<T>().setCode(RetCode.SUCCESS.getCode()).setMsg(RetCode.SUCCESS.getText()).setResult(data);
     }
@@ -32,4 +36,6 @@ public class RetResponse {
     public static <T> Result<T> make(int code, String msg, T data) {
         return new Result<T>().setCode(code).setMsg(msg).setResult(data);
     }
+
+
 }
