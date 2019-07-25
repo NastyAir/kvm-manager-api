@@ -9,7 +9,7 @@ public enum RetCode {
     PARAMETER_ERROR("参数错误", 1005),
 
     AUTH_INVALIDATION("登录已失效，请重新登录", 601),
-    AUTH_FAIL("认证失败", 601),
+    AUTH_FAIL("认证失败", 602),
     AUTH_NO_ACCESS("抱歉，您没有访问权限", 603),
     ;
 

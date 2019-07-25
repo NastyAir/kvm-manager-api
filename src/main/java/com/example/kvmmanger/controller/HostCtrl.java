@@ -16,7 +16,7 @@ import javax.validation.constraints.NotBlank;
 
 //@CrossOrigin
 @RestController
-@RequestMapping("/api/host")
+@RequestMapping("/host")
 public class HostCtrl {
 
     private final KvmService kvmService;
