@@ -4,6 +4,8 @@ import com.example.kvmmanger.config.security.jwt.AuthenticationFailHandler;
 import com.example.kvmmanger.config.security.jwt.AuthenticationSuccessHandler;
 import com.example.kvmmanger.config.security.jwt.JWTAuthenticationFilter;
 import com.example.kvmmanger.config.security.jwt.RestAccessDeniedHandler;
+import com.example.kvmmanger.config.security.logout.MyLogoutHandler;
+import com.example.kvmmanger.config.security.logout.MyLogoutSuccessHandler;
 import com.example.kvmmanger.config.security.permission.MyFilterSecurityInterceptor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,26 +44,24 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Value("${auth.tokenExpireTime}")
     private Integer tokenExpireTime;
 
-    @Autowired
-    private IgnoredUrlsProperties ignoredUrlsProperties;
-
-//    @Autowired
-//    private UserDetailsServiceImpl userDetailsService;
-
-    @Autowired
-    private AuthenticationSuccessHandler successHandler;
-
-    @Autowired
-    private AuthenticationFailHandler failHandler;
+    private final IgnoredUrlsProperties ignoredUrlsProperties;
+    private final AuthenticationSuccessHandler successHandler;
+    private final AuthenticationFailHandler failHandler;
+    private final RestAccessDeniedHandler accessDeniedHandler;
+    private final MyLogoutHandler myLogoutHandler;
+    private final MyLogoutSuccessHandler myLogoutSuccessHandler;
+    private final StringRedisTemplate redisTemplate;
 
     @Autowired
-    private RestAccessDeniedHandler accessDeniedHandler;
-
-//    @Autowired
-//    private MyFilterSecurityInterceptor myFilterSecurityInterceptor;
-
-    @Autowired
-    private StringRedisTemplate redisTemplate;
+    public WebSecurityConfig(IgnoredUrlsProperties ignoredUrlsProperties, AuthenticationSuccessHandler successHandler, AuthenticationFailHandler failHandler, RestAccessDeniedHandler accessDeniedHandler, MyLogoutHandler myLogoutHandler, MyLogoutSuccessHandler myLogoutSuccessHandler, StringRedisTemplate redisTemplate) {
+        this.ignoredUrlsProperties = ignoredUrlsProperties;
+        this.successHandler = successHandler;
+        this.failHandler = failHandler;
+        this.accessDeniedHandler = accessDeniedHandler;
+        this.myLogoutHandler = myLogoutHandler;
+        this.myLogoutSuccessHandler = myLogoutSuccessHandler;
+        this.redisTemplate = redisTemplate;
+    }
 
 //    @Override
 //    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -87,6 +87,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //                .loginPage("/login")
                 //登录请求url
                 .loginProcessingUrl("/login")
+
                 .permitAll()
 
                 //成功处理类
@@ -94,6 +95,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 //失败
                 .failureHandler(failHandler)
 //                .and().antMatcher(HttpMethod.GET)
+                .and().logout().logoutUrl("/logout")
+                //注销处理类
+                .addLogoutHandler(myLogoutHandler)
+                //注销成功处理类
+                .logoutSuccessHandler(myLogoutSuccessHandler)
                 .and()
                 //允许网页iframe
                 .headers().frameOptions().disable()
