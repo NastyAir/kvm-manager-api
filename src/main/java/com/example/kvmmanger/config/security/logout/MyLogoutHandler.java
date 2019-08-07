@@ -12,6 +12,7 @@ public class MyLogoutHandler implements LogoutHandler {
     @Override
 //    @SysLog(moudle = Constant.LOG_MOUDLE_SYSTEM_AUTH, event = Constant.LOG_EVENT_LOGOUT, logType = Constant.LOG_TYPE_DEFENSE)
     public void logout(HttpServletRequest request, HttpServletResponse httpServletResponse, Authentication authentication) {
+        //todo 注销token
         request.getSession().invalidate();
     }
 }

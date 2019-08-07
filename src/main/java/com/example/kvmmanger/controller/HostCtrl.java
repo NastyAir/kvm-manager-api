@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import java.util.ArrayList;
+import java.util.List;
 
 //@CrossOrigin
 @RestController
@@ -62,6 +64,28 @@ public class HostCtrl {
         Result message = hostService.del(id);
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
+    @ApiOperation(value = "批量删除主机", notes = "", response = ResponseEntity.class, tags = {"host"})
+    @DeleteMapping("/batch/{id}")
+    public ResponseEntity batchDel(@NotBlank(message = "id不能为空") @PathVariable Integer[] ids) {
+        List<Integer> successList = new ArrayList<>();
+        List<Integer> failList = new ArrayList<>();
+        for (Integer id : ids) {
+            if (id != null) {
+                ResponseEntity  responseEntity = del(id);
+                if (((Result) responseEntity.getBody()).isSuccess()) {
+                    successList.add(id);
+                } else {
+                    failList.add(id);
+                }
+            }
+        }
+        StringBuilder stringBuilder = new StringBuilder("删除成功" + successList.size() + "个\n");
+        if (failList.size() > 0) {
+            stringBuilder.append("删除失败").append(failList.size()).append("个。");
+        }
+        return new ResponseEntity<>(stringBuilder.toString(), HttpStatus.OK);
+    }
+
     @ApiOperation(value = "主机详情", notes = "", response = ResponseEntity.class, tags = {"host"})
     @GetMapping("/{id}")
     public ResponseEntity get(@NotBlank(message = "id不能为空") @PathVariable Integer id) throws LibvirtException {
