@@ -1,6 +1,7 @@
 package com.example.kvmmanger.controller;
 
 import com.example.kvmmanger.common.Result;
+import com.example.kvmmanger.common.util.RetResponse;
 import com.example.kvmmanger.entity.Host;
 import com.example.kvmmanger.service.HostService;
 import com.example.kvmmanger.service.KvmService;
@@ -65,8 +66,8 @@ public class HostCtrl {
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
     @ApiOperation(value = "批量删除主机", notes = "", response = ResponseEntity.class, tags = {"host"})
-    @DeleteMapping("/batch/{id}")
-    public ResponseEntity batchDel(@NotBlank(message = "id不能为空") @PathVariable Integer[] ids) {
+    @DeleteMapping("/batch")
+    public ResponseEntity batchDel(@NotBlank(message = "id不能为空") @RequestParam Integer[] ids) {
         List<Integer> successList = new ArrayList<>();
         List<Integer> failList = new ArrayList<>();
         for (Integer id : ids) {
@@ -83,7 +84,7 @@ public class HostCtrl {
         if (failList.size() > 0) {
             stringBuilder.append("删除失败").append(failList.size()).append("个。");
         }
-        return new ResponseEntity<>(stringBuilder.toString(), HttpStatus.OK);
+        return new ResponseEntity<>(RetResponse.success(stringBuilder.toString()), HttpStatus.OK);
     }
 
     @ApiOperation(value = "主机详情", notes = "", response = ResponseEntity.class, tags = {"host"})
