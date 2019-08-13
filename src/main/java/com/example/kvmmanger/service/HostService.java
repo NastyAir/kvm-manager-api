@@ -15,10 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -90,5 +87,22 @@ public class HostService {
         NodeInfo nodeInfo = connect.nodeInfo();
         connectionProvider.returnConnection(connect);
         return RetResponse.success(nodeInfo);
+    }
+
+    public Result list(String hostName) {
+        // 设置查询条件
+        Specification<Host> specification =  (root, criteriaQuery, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if (StringUtils.isNotEmpty(hostName)) {
+                predicates.add(criteriaBuilder.like(root.get("name"), "%" + hostName + "%"));
+            }
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+        List<Host> hostList = hostRepository.findAll(specification);
+        return  RetResponse.success(hostList);
+    }
+
+    public Host getOne(Integer hostId) {
+        return hostRepository.getOne(hostId);
     }
 }

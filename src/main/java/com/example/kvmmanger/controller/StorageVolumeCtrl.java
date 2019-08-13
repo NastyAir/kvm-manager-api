@@ -1,6 +1,5 @@
 package com.example.kvmmanger.controller;
 
-
 import com.example.kvmmanger.common.Result;
 import com.example.kvmmanger.common.contant.RetCode;
 import com.example.kvmmanger.common.exception.BusinessException;
@@ -16,27 +15,27 @@ import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/storagePool")
-public class StoragePoolCtrl {
-
+@RequestMapping("/storageVolume")
+public class StorageVolumeCtrl {
     private final KvmService kvmService;
     private final HostService hostService;
 
     @Autowired
-    public StoragePoolCtrl(KvmService kvmService, HostService hostService) {
+    public StorageVolumeCtrl(KvmService kvmService, HostService hostService) {
         this.kvmService = kvmService;
         this.hostService = hostService;
     }
 
-    @ApiOperation(value = "获取存储池列表", notes = "", response = ResponseEntity.class, tags = {"storagePool"})
+    @ApiOperation(value = "获取存储卷列表", notes = "", response = ResponseEntity.class, tags = {"storageVolume"})
     @GetMapping
     public ResponseEntity list(
-            @RequestParam Integer hostId
+            @RequestParam Integer hostId,
+            @RequestParam String poolName
     ) {
         Host host = hostService.getOne(hostId);
         Result message = null;
         try {
-            message = kvmService.listStoragePool(host);
+            message = kvmService.listStorageVolume(host,poolName);
         } catch (LibvirtException e) {
             e.printStackTrace();
             throw new BusinessException(RetCode.FAIL, "连接KVM异常，获取信息失败");
@@ -44,16 +43,17 @@ public class StoragePoolCtrl {
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
-    @ApiOperation(value = "获取存储池详情", notes = "", response = ResponseEntity.class, tags = {"storagePool"})
-    @GetMapping("/host/{hostId}/name/{name}")
+    @ApiOperation(value = "获取存储卷详情", notes = "", response = ResponseEntity.class, tags = {"storageVolume"})
+    @GetMapping("/host/{hostId}/poolName/{poolName}/volumeName/{volumeName}")
     public ResponseEntity get(
             @PathVariable Integer hostId,
-            @PathVariable String name
+            @PathVariable String poolName,
+            @PathVariable String volumeName
     ) {
         Host host = hostService.getOne(hostId);
         Result message = null;
         try {
-            message = kvmService.getStoragePoolByName(host, name);
+            message = kvmService.getStorageVolumebyName(host, poolName,volumeName);
         } catch (LibvirtException e) {
             e.printStackTrace();
             throw new BusinessException(RetCode.FAIL, "连接KVM异常，获取信息失败");
@@ -61,16 +61,17 @@ public class StoragePoolCtrl {
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
-    @ApiOperation(value = "创建存储池（临时）", notes = "", response = ResponseEntity.class, tags = {"storagePool"})
+    @ApiOperation(value = "创建存储卷（临时）", notes = "", response = ResponseEntity.class, tags = {"storageVolume"})
     @PostMapping("/temp")
     public ResponseEntity add(
             @RequestParam Integer hostId,
-            @RequestParam String xmlDesc
+            @RequestParam String xmlDesc,
+            @RequestParam String poolName
     ) {
         Host host = hostService.getOne(hostId);
         Result message = null;
         try {
-            message = kvmService.createStoragePool(host, xmlDesc);
+            message = kvmService.createStorageVolume(host,poolName, xmlDesc);
         } catch (LibvirtException e) {
             e.printStackTrace();
             throw new BusinessException(RetCode.FAIL, "连接KVM异常，获取信息失败");
@@ -78,16 +79,18 @@ public class StoragePoolCtrl {
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
-    @ApiOperation(value = "定义存储池", notes = "", response = ResponseEntity.class, tags = {"storagePool"})
+    @ApiOperation(value = "定义存储卷", notes = "", response = ResponseEntity.class, tags = {"storageVolume"})
     @PostMapping
-    public ResponseEntity define(
+    public ResponseEntity clone(
             @RequestParam Integer hostId,
+            @RequestParam String poolName,
+            @RequestParam String volumeName,
             @RequestParam String xmlDesc
     ) {
         Host host = hostService.getOne(hostId);
         Result message = null;
         try {
-            message = kvmService.defineStoragePool(host, xmlDesc);
+            message = kvmService.cloneStorageVolume(host,poolName,volumeName, xmlDesc);
         } catch (LibvirtException e) {
             e.printStackTrace();
             throw new BusinessException(RetCode.FAIL, "连接KVM异常，获取信息失败");
@@ -95,16 +98,17 @@ public class StoragePoolCtrl {
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
-    @ApiOperation(value = "删除存储池", notes = "", response = ResponseEntity.class, tags = {"storagePool"})
+    @ApiOperation(value = "删除存储卷", notes = "", response = ResponseEntity.class, tags = {"storageVolume"})
     @DeleteMapping
     public ResponseEntity del(
             @PathVariable Integer hostId,
-            @PathVariable String name
+            @RequestParam String poolName,
+            @RequestParam String volumeName
     ) {
         Host host = hostService.getOne(hostId);
         Result message = null;
         try {
-            message = kvmService.delStoragePool(host, name);
+            message = kvmService.deleteStorageVolume(host, poolName,volumeName);
         } catch (LibvirtException e) {
             e.printStackTrace();
             throw new BusinessException(RetCode.FAIL, "连接KVM异常，获取信息失败");

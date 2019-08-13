@@ -31,7 +31,7 @@ public class HostCtrl {
         this.hostService = hostService;
     }
 
-    @ApiOperation(value = "获取主机列表", notes = "", response = ResponseEntity.class, tags = {"host"})
+    @ApiOperation(value = "获取主机列表 分页", notes = "", response = ResponseEntity.class, tags = {"host"})
     @GetMapping
     public ResponseEntity list(
             @RequestParam(required = false) String hostName,
@@ -43,6 +43,15 @@ public class HostCtrl {
         Result message = hostService.list(hostName, order, orderColumn, currentPage, pageSize);
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
+
+  /*  @ApiOperation(value = "获取主机列表 树型", notes = "", response = ResponseEntity.class, tags = {"host"})
+    @GetMapping("/tree")
+    public ResponseEntity list(
+            @RequestParam(required = false) String hostName
+    ) {
+        Result message = hostService.list(hostName);
+        return new ResponseEntity<>(message, HttpStatus.OK);
+    }*/
 
     @ApiOperation(value = "新增主机", notes = "", response = ResponseEntity.class, tags = {"host"})
     @PostMapping

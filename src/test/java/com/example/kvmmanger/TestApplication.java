@@ -16,7 +16,10 @@ public class TestApplication {
      */
     public void init() {
         try {
-            kvmConn = new Connect("qemu+tcp://192.168.71.147/system");
+            long start = System.currentTimeMillis();
+            kvmConn = new Connect("qemu+tcp://10.6.30.105/system");
+            long end = System.currentTimeMillis();
+            System.out.println("time="+(end-start));
         } catch (LibvirtException e) {
             e.printStackTrace();
         }
@@ -74,7 +77,6 @@ public class TestApplication {
         logger.info("get storage pool by name execute succeeded");
         logger.info("request parameter:{}", name);
 //        Connect connect = new Connect("qemu+tcp://192.168.10.105:16509/system", true);
-
         StoragePool storagePool = kvmConn.storagePoolLookupByName(name);
         StoragePoolInfo storagePoolInfo = storagePool.getInfo();
 
@@ -498,9 +500,9 @@ public class TestApplication {
         application.init();
 //        application.remoteConnectByTcp();
 //        application.createStoragePool();
-//        application.listStoragePool();
+        application.listStoragePool();
 //        application.destroyStoragePool();
-//        application.getStoragePoolbyName("virtimages");
+        application.getStoragePoolbyName("virtimages");
 //        application.getStoragePoolbyName("virtimage01");
 
 //        application.activePool();
@@ -513,7 +515,8 @@ public class TestApplication {
 //        application.deleteStorageVolume("virtimage01","kvmdemo.qcow2");
 //        application.listDomain();
 //        application.getDomainbyId(3);
-        application.createDomain();
+//        application.createDomain();
+
     }
 
     private void getDomainbyId(int id) throws LibvirtException {
