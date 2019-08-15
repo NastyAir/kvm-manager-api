@@ -52,12 +52,7 @@ public class StoragePoolCtrl {
     ) {
         Host host = hostService.getOne(hostId);
         Result message = null;
-        try {
-            message = kvmService.getStoragePoolByName(host, name);
-        } catch (LibvirtException e) {
-            e.printStackTrace();
-            throw new BusinessException(RetCode.FAIL, "连接KVM异常，获取信息失败");
-        }
+        message = kvmService.getStoragePoolByName(host, name);
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
@@ -86,20 +81,15 @@ public class StoragePoolCtrl {
     ) {
         Host host = hostService.getOne(hostId);
         Result message = null;
-        try {
-            message = kvmService.defineStoragePool(host, xmlDesc);
-        } catch (LibvirtException e) {
-            e.printStackTrace();
-            throw new BusinessException(RetCode.FAIL, "连接KVM异常，获取信息失败");
-        }
+        message = kvmService.defineStoragePool(host, xmlDesc);
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
     @ApiOperation(value = "删除存储池", notes = "", response = ResponseEntity.class, tags = {"storagePool"})
-    @DeleteMapping
+    @DeleteMapping()
     public ResponseEntity del(
-            @PathVariable Integer hostId,
-            @PathVariable String name
+            @RequestParam Integer hostId,
+            @RequestParam String name
     ) {
         Host host = hostService.getOne(hostId);
         Result message = null;

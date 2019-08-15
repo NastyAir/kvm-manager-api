@@ -62,7 +62,7 @@ public class StorageVolumeCtrl {
     }
 
     @ApiOperation(value = "创建存储卷（临时）", notes = "", response = ResponseEntity.class, tags = {"storageVolume"})
-    @PostMapping("/temp")
+    @PostMapping
     public ResponseEntity add(
             @RequestParam Integer hostId,
             @RequestParam String xmlDesc,
@@ -79,8 +79,8 @@ public class StorageVolumeCtrl {
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
-    @ApiOperation(value = "定义存储卷", notes = "", response = ResponseEntity.class, tags = {"storageVolume"})
-    @PostMapping
+    @ApiOperation(value = "克隆存储卷", notes = "", response = ResponseEntity.class, tags = {"storageVolume"})
+    @PostMapping("/clone")
     public ResponseEntity clone(
             @RequestParam Integer hostId,
             @RequestParam String poolName,
@@ -89,12 +89,7 @@ public class StorageVolumeCtrl {
     ) {
         Host host = hostService.getOne(hostId);
         Result message = null;
-        try {
-            message = kvmService.cloneStorageVolume(host,poolName,volumeName, xmlDesc);
-        } catch (LibvirtException e) {
-            e.printStackTrace();
-            throw new BusinessException(RetCode.FAIL, "连接KVM异常，获取信息失败");
-        }
+        message = kvmService.cloneStorageVolume(host,poolName,volumeName, xmlDesc);
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 

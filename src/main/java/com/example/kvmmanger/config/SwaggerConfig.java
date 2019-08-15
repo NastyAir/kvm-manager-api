@@ -28,7 +28,7 @@ public class SwaggerConfig {
                 .description("令牌")
                 .modelRef(new ModelRef("string"))
                 .parameterType("header")
-                .defaultValue("Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImF1dGhvcml0aWVzIjoiW10iLCJleHAiOjE1NjU4NDEwOTd9.4ZXLJL-R4CnJB4v0buK70XI3933p7xr-h6SIExhb2EIVC16ufdSdPtvceIxekfSPpeCANCOJ7jSauDslK6dsnw")
+                .defaultValue("Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImF1dGhvcml0aWVzIjoiW10iLCJleHAiOjE1Njc2NDUzMDJ9.LjFuJg5nP8bOg4COIMRMCzyE70hkXMBLG8eEM8MAgTrQvylGoKwifEkuMJROiCQK27upNWzyDXTGBKiazIYV-Q")
                 .required(false).build();
         pars.add(tokenPar.build());
         return new Docket(DocumentationType.SWAGGER_2)
