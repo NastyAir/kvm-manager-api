@@ -11,7 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.libvirt.*;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -212,8 +214,9 @@ public class KvmService {
         } catch (LibvirtException e) {
             connectionProvider.returnConnection(connect);
             e.printStackTrace();
+        } finally {
+            connectionProvider.returnConnection(connect);
         }
-        connectionProvider.returnConnection(connect);
         return RetResponse.success(storageVolInfo);
     }
 
@@ -236,6 +239,134 @@ public class KvmService {
         storageVol.wipe();
         storageVol.delete(0);
         connectionProvider.returnConnection(connect);
+        return RetResponse.success();
+    }
+
+//======================虚拟机======================
+
+    /**
+     * 虚拟机 列表
+     *
+     * @param host
+     * @return
+     * @throws LibvirtException
+     */
+    public Result<List<Domain>> listDomain(Host host) {
+        KvmConnectionProvider connectionProvider = KvmMultipleConnFactory.getKvmConnect(host.getIp());
+        Connect connect = connectionProvider.getConnection();
+        List<Domain> domains = new ArrayList<>();
+        try {
+            int[] domainIds = connect.listDomains();
+            for (int domainId : domainIds) {
+                Domain domain = connect.domainLookupByID(domainId);
+                domains.add(domain);
+            }
+            String[] domainNames = connect.listDefinedDomains();
+            for (String domainName : domainNames) {
+                Domain domain = connect.domainLookupByName(domainName);
+                domains.add(domain);
+            }
+        } catch (LibvirtException e) {
+            log.error(e.getMessage());
+            throw new BusinessException(RetCode.FAIL);
+        } finally {
+            connectionProvider.returnConnection(connect);
+        }
+        return RetResponse.success(domains);
+    }
+
+    /**
+     * 获取虚拟机详情
+     *
+     * @param host
+     * @param domainId
+     * @return
+     * @throws LibvirtException
+     */
+    public Result<Domain> getDomainbyId(Host host, int domainId) {
+        KvmConnectionProvider connectionProvider = KvmMultipleConnFactory.getKvmConnect(host.getIp());
+        Connect connect = connectionProvider.getConnection();
+        Domain domain = null;
+        try {
+            domain = connect.domainLookupByID(domainId);
+        } catch (LibvirtException e) {
+            e.printStackTrace();
+            connectionProvider.returnConnection(connect);
+        } finally {
+            connectionProvider.returnConnection(connect);
+        }
+        return RetResponse.success(domain);
+    }
+
+    /**
+     * 创建虚拟机（临时）
+     *
+     * @param host
+     * @param xmlDesc
+     * @return
+     * @throws LibvirtException
+     */
+    public Result createDomain(Host host, String xmlDesc) {
+        KvmConnectionProvider connectionProvider = KvmMultipleConnFactory.getKvmConnect(host.getIp());
+        Connect connect = connectionProvider.getConnection();
+        Domain domain = null;
+        try {
+            domain = connect.domainCreateXML(xmlDesc, 0);
+        } catch (LibvirtException e) {
+            e.printStackTrace();
+        } finally {
+            connectionProvider.returnConnection(connect);
+        }
+        return RetResponse.success(domain);
+    }
+
+    /**
+     * 定义虚拟机
+     *
+     * @param host
+     * @param xmlDesc
+     * @return
+     * @throws LibvirtException
+     */
+    public Result defineDomain(Host host, String xmlDesc) {
+        KvmConnectionProvider connectionProvider = KvmMultipleConnFactory.getKvmConnect(host.getIp());
+        Connect connect = connectionProvider.getConnection();
+        Domain domain = null;
+        try {
+            domain = connect.domainDefineXML(xmlDesc);
+            // 是否随宿主机开机自动启动
+            domain.setAutostart(false);
+            domain.create(); // 定义完后直接启动
+        } catch (LibvirtException e) {
+            log.error(e.getMessage());
+            throw new BusinessException(RetCode.FAIL);
+        } finally {
+            connectionProvider.returnConnection(connect);
+        }
+        return RetResponse.success(domain);
+    }
+
+    /**
+     * 删除虚拟机
+     *
+     * @param host
+     * @param name
+     * @return
+     * @throws LibvirtException
+     */
+    public Result undefineDomain(Host host, String name) {
+        KvmConnectionProvider connectionProvider = KvmMultipleConnFactory.getKvmConnect(host.getIp());
+        Connect connect = connectionProvider.getConnection();
+        Domain domain = null;
+        try {
+            domain = connect.domainLookupByName(name);
+            domain.destroy(); // 强制关机
+            domain.undefine();
+        } catch (LibvirtException e) {
+            log.error(e.getMessage());
+        } finally {
+            connectionProvider.returnConnection(connect);
+        }
         return RetResponse.success();
     }
 

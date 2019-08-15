@@ -472,7 +472,6 @@ public class TestApplication {
 //        domain.abortJob();
         // 是否随宿主机开机自动启动
         domain.setAutostart(false);
-
         domain.create(); // 定义完后直接启动
         logger.info("虚拟机的id：{}", domain.getID());
         logger.info("虚拟机的uuid：{}", domain.getUUIDString());
@@ -502,9 +501,9 @@ public class TestApplication {
 //        application.createStoragePool();
         application.listStoragePool();
 //        application.destroyStoragePool();
-        application.getStoragePoolbyName("virtimages");
+//        application.getStoragePoolbyName("virtimages");
 //        application.getStoragePoolbyName("virtimage01");
-
+        application.defineDomain();
 //        application.activePool();
 //        application.defineStoragePool();
 //        application.listStoragePool();

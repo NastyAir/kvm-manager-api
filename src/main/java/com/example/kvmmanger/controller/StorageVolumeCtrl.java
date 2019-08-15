@@ -96,7 +96,7 @@ public class StorageVolumeCtrl {
     @ApiOperation(value = "删除存储卷", notes = "", response = ResponseEntity.class, tags = {"storageVolume"})
     @DeleteMapping
     public ResponseEntity del(
-            @PathVariable Integer hostId,
+            @RequestParam Integer hostId,
             @RequestParam String poolName,
             @RequestParam String volumeName
     ) {
