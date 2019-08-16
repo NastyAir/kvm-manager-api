@@ -8,13 +8,19 @@ import com.example.kvmmanger.common.kvm.KvmMultipleConnFactory;
 import com.example.kvmmanger.common.util.RetResponse;
 import com.example.kvmmanger.entity.Host;
 import lombok.extern.slf4j.Slf4j;
+import org.dom4j.Document;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
 import org.libvirt.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -251,20 +257,20 @@ public class KvmService {
      * @return
      * @throws LibvirtException
      */
-    public Result<List<Domain>> listDomain(Host host) {
+    public Result<List<Map<String, Object>>> listDomain(Host host) {
         KvmConnectionProvider connectionProvider = KvmMultipleConnFactory.getKvmConnect(host.getIp());
         Connect connect = connectionProvider.getConnection();
-        List<Domain> domains = new ArrayList<>();
+        List<Map<String, Object>> domains = new ArrayList<>();
         try {
             int[] domainIds = connect.listDomains();
             for (int domainId : domainIds) {
                 Domain domain = connect.domainLookupByID(domainId);
-                domains.add(domain);
+                domains.add(getMap(domain));
             }
             String[] domainNames = connect.listDefinedDomains();
             for (String domainName : domainNames) {
                 Domain domain = connect.domainLookupByName(domainName);
-                domains.add(domain);
+                domains.add(getMap(domain));
             }
         } catch (LibvirtException e) {
             log.error(e.getMessage());
@@ -273,6 +279,18 @@ public class KvmService {
             connectionProvider.returnConnection(connect);
         }
         return RetResponse.success(domains);
+    }
+
+    private Map<String, Object> getMap(Domain domain) throws LibvirtException {
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", domain.getID());
+        map.put("uuid", domain.getUUIDString());
+        map.put("name", domain.getName());
+        map.put("autostart", domain.getAutostart());
+//        map.put("vcpus",domain.getVcpusCpuMaps());
+        map.put("info", domain.getInfo());
+        map.put("XMLDesc", domain.getXMLDesc(0));
+        return map;
     }
 
     /**
@@ -320,6 +338,9 @@ public class KvmService {
         return RetResponse.success(domain);
     }
 
+    @Value("${novnc.token}")
+    String novncTokenFilePath;
+
     /**
      * 定义虚拟机
      *
@@ -332,18 +353,54 @@ public class KvmService {
         KvmConnectionProvider connectionProvider = KvmMultipleConnFactory.getKvmConnect(host.getIp());
         Connect connect = connectionProvider.getConnection();
         Domain domain = null;
+        String uuid;
+        String vncPort;
         try {
             domain = connect.domainDefineXML(xmlDesc);
             // 是否随宿主机开机自动启动
             domain.setAutostart(false);
             domain.create(); // 定义完后直接启动
+
+            uuid =  domain.getUUIDString();
+            vncPort=getVncPort(uuid,connect);
         } catch (LibvirtException e) {
             log.error(e.getMessage());
             throw new BusinessException(RetCode.FAIL);
         } finally {
             connectionProvider.returnConnection(connect);
         }
+        String line=uuid+": "+host.getIp()+":"+vncPort;
+        boolean success = writeToken(Collections.singletonList(line), uuid);
+        if (!success){
+            throw new BusinessException(RetCode.FAIL,"写入token失败");
+        }
         return RetResponse.success(domain);
+    }
+    private static String getVncPort(String uuid, Connect connect ){
+        try{
+            String vncPort="";
+            Domain domain =connect.domainLookupByUUIDString(uuid);
+            String vmXml=domain.getXMLDesc(0);
+            Document document = DocumentHelper.parseText(vmXml);
+            Element elem = document.getRootElement();
+            Element contactElem = elem.element("devices");
+            vncPort=contactElem.element("graphics").attribute("port").getValue();
+            return vncPort;
+        }catch (Exception e){
+            log.error(e.getMessage(),e);
+            return "null";
+        }
+    }
+    private boolean writeToken(List<String> lines,String uuid) {
+
+        Path fileName = new File(novncTokenFilePath + uuid).toPath();
+        try {
+            Files.write(fileName, lines, Charset.forName("UTF-8"));
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            return false;
+        }
+        return true;
     }
 
     /**
