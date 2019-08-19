@@ -297,16 +297,16 @@ public class KvmService {
      * 获取虚拟机详情
      *
      * @param host
-     * @param domainId
+     * @param uuid
      * @return
      * @throws LibvirtException
      */
-    public Result<Domain> getDomainbyId(Host host, int domainId) {
+    public Result<Domain> getDomainbyId(Host host, String uuid) {
         KvmConnectionProvider connectionProvider = KvmMultipleConnFactory.getKvmConnect(host.getIp());
         Connect connect = connectionProvider.getConnection();
         Domain domain = null;
         try {
-            domain = connect.domainLookupByID(domainId);
+            domain = connect.domainLookupByUUIDString(uuid);
         } catch (LibvirtException e) {
             e.printStackTrace();
             connectionProvider.returnConnection(connect);
@@ -361,37 +361,39 @@ public class KvmService {
             domain.setAutostart(false);
             domain.create(); // 定义完后直接启动
 
-            uuid =  domain.getUUIDString();
-            vncPort=getVncPort(uuid,connect);
+            uuid = domain.getUUIDString();
+            vncPort = getVncPort(uuid, connect);
         } catch (LibvirtException e) {
             log.error(e.getMessage());
             throw new BusinessException(RetCode.FAIL);
         } finally {
             connectionProvider.returnConnection(connect);
         }
-        String line=uuid+": "+host.getIp()+":"+vncPort;
+        String line = uuid + ": " + host.getIp() + ":" + vncPort;
         boolean success = writeToken(Collections.singletonList(line), uuid);
-        if (!success){
-            throw new BusinessException(RetCode.FAIL,"写入token失败");
+        if (!success) {
+            throw new BusinessException(RetCode.FAIL, "写入token失败");
         }
         return RetResponse.success(domain);
     }
-    private static String getVncPort(String uuid, Connect connect ){
-        try{
-            String vncPort="";
-            Domain domain =connect.domainLookupByUUIDString(uuid);
-            String vmXml=domain.getXMLDesc(0);
+
+    private static String getVncPort(String uuid, Connect connect) {
+        try {
+            String vncPort = "";
+            Domain domain = connect.domainLookupByUUIDString(uuid);
+            String vmXml = domain.getXMLDesc(0);
             Document document = DocumentHelper.parseText(vmXml);
             Element elem = document.getRootElement();
             Element contactElem = elem.element("devices");
-            vncPort=contactElem.element("graphics").attribute("port").getValue();
+            vncPort = contactElem.element("graphics").attribute("port").getValue();
             return vncPort;
-        }catch (Exception e){
-            log.error(e.getMessage(),e);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return "null";
         }
     }
-    private boolean writeToken(List<String> lines,String uuid) {
+
+    private boolean writeToken(List<String> lines, String uuid) {
 
         Path fileName = new File(novncTokenFilePath + uuid).toPath();
         try {
@@ -407,18 +409,56 @@ public class KvmService {
      * 删除虚拟机
      *
      * @param host
-     * @param name
+     * @param uuid
      * @return
      * @throws LibvirtException
      */
-    public Result undefineDomain(Host host, String name) {
+    public Result undefineDomain(Host host, String uuid) {
         KvmConnectionProvider connectionProvider = KvmMultipleConnFactory.getKvmConnect(host.getIp());
         Connect connect = connectionProvider.getConnection();
         Domain domain = null;
         try {
-            domain = connect.domainLookupByName(name);
+            domain = connect.domainLookupByUUIDString(uuid);
             domain.destroy(); // 强制关机
             domain.undefine();
+        } catch (LibvirtException e) {
+            log.error(e.getMessage());
+        } finally {
+            connectionProvider.returnConnection(connect);
+        }
+        return RetResponse.success();
+    }
+
+    public Result domainAction(Host host, String uuid, String option) {
+        KvmConnectionProvider connectionProvider = KvmMultipleConnFactory.getKvmConnect(host.getIp());
+        Connect connect = connectionProvider.getConnection();
+        Domain domain = null;
+        try {
+            domain = connect.domainLookupByUUIDString(uuid);
+            switch (option) {
+                case "reboot": {
+                    domain.reboot(0);
+                }
+                case "shutdown": {
+                    domain.shutdown();
+                }
+                case "start": {
+                    domain.create();
+                }
+                //  强制断电
+                case "destroy": {
+                    domain.destroy();
+                }
+                //  挂起
+                case "suspend": {
+                    domain.suspend ();
+                }
+                //  恢复挂起
+                case "resume": {
+                    domain.resume ();
+                }
+            }
+            domain.shutdown(); // 强制关机
         } catch (LibvirtException e) {
             log.error(e.getMessage());
         } finally {

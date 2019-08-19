@@ -25,6 +25,7 @@ public class DomainCtrl {
         this.kvmService = kvmService;
         this.hostService = hostService;
     }
+
     @ApiOperation(value = "获取客户机列表", notes = "", response = ResponseEntity.class, tags = {"domain"})
     @GetMapping
     public ResponseEntity list(
@@ -37,14 +38,14 @@ public class DomainCtrl {
     }
 
     @ApiOperation(value = "获取客户机详情", notes = "", response = ResponseEntity.class, tags = {"domain"})
-    @GetMapping("/{domainId}/host/{hostId}")
+    @GetMapping("/{uuid}/host/{hostId}")
     public ResponseEntity get(
             @PathVariable Integer hostId,
-            @PathVariable Integer domainId
+            @PathVariable String uuid
     ) {
         Host host = hostService.getOne(hostId);
         Result message = null;
-        message = kvmService.getDomainbyId(host, domainId);
+        message = kvmService.getDomainbyId(host, uuid);
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
@@ -77,11 +78,83 @@ public class DomainCtrl {
     @DeleteMapping()
     public ResponseEntity del(
             @RequestParam Integer hostId,
-            @RequestParam String name
+            @RequestParam String uuid
     ) {
         Host host = hostService.getOne(hostId);
         Result message = null;
-        message = kvmService.undefineDomain(host, name);
+        message = kvmService.undefineDomain(host, uuid);
+        return new ResponseEntity<>(message, HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "开启客户机", notes = "", response = ResponseEntity.class, tags = {"domain"})
+    @PutMapping()
+    public ResponseEntity start(
+            @RequestParam Integer hostId,
+            @RequestParam String uuid
+    ) {
+        Host host = hostService.getOne(hostId);
+        Result message = null;
+        message = kvmService.domainAction(host, uuid, "start");
+        return new ResponseEntity<>(message, HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "关闭客户机", notes = "", response = ResponseEntity.class, tags = {"domain"})
+    @PutMapping()
+    public ResponseEntity shutdown(
+            @RequestParam Integer hostId,
+            @RequestParam String uuid
+    ) {
+        Host host = hostService.getOne(hostId);
+        Result message = null;
+        message = kvmService.domainAction(host, uuid, "shutdown");
+        return new ResponseEntity<>(message, HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "重启客户机", notes = "", response = ResponseEntity.class, tags = {"domain"})
+    @PutMapping()
+    public ResponseEntity reboot(
+            @RequestParam Integer hostId,
+            @RequestParam String uuid
+    ) {
+        Host host = hostService.getOne(hostId);
+        Result message = null;
+        message = kvmService.domainAction(host, uuid, "reboot");
+        return new ResponseEntity<>(message, HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "关闭客户机电源", notes = "", response = ResponseEntity.class, tags = {"domain"})
+    @PutMapping()
+    public ResponseEntity destroy(
+            @RequestParam Integer hostId,
+            @RequestParam String uuid
+    ) {
+        Host host = hostService.getOne(hostId);
+        Result message = null;
+        message = kvmService.domainAction(host, uuid, "destroy");
+        return new ResponseEntity<>(message, HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "挂起客户机", notes = "", response = ResponseEntity.class, tags = {"domain"})
+    @PutMapping()
+    public ResponseEntity suspend(
+            @RequestParam Integer hostId,
+            @RequestParam String uuid
+    ) {
+        Host host = hostService.getOne(hostId);
+        Result message = null;
+        message = kvmService.domainAction(host, uuid, "suspend");
+        return new ResponseEntity<>(message, HttpStatus.OK);
+    }
+
+    @ApiOperation(value = "恢复客户机", notes = "", response = ResponseEntity.class, tags = {"domain"})
+    @PutMapping()
+    public ResponseEntity resume(
+            @RequestParam Integer hostId,
+            @RequestParam String uuid
+    ) {
+        Host host = hostService.getOne(hostId);
+        Result message = null;
+        message = kvmService.domainAction(host, uuid, "resume");
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 }
