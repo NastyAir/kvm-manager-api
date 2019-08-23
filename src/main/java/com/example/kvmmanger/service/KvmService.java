@@ -265,12 +265,12 @@ public class KvmService {
             int[] domainIds = connect.listDomains();
             for (int domainId : domainIds) {
                 Domain domain = connect.domainLookupByID(domainId);
-                domains.add(getMap(domain));
+                domains.add(getMap(domain,host.getId()));
             }
             String[] domainNames = connect.listDefinedDomains();
             for (String domainName : domainNames) {
                 Domain domain = connect.domainLookupByName(domainName);
-                domains.add(getMap(domain));
+                domains.add(getMap(domain,host.getId()));
             }
         } catch (LibvirtException e) {
             log.error(e.getMessage());
@@ -281,9 +281,10 @@ public class KvmService {
         return RetResponse.success(domains);
     }
 
-    private Map<String, Object> getMap(Domain domain) throws LibvirtException {
+    private Map<String, Object> getMap(Domain domain,int hostId) throws LibvirtException {
         Map<String, Object> map = new HashMap<>();
         map.put("id", domain.getID());
+        map.put("hostId", hostId);
         map.put("uuid", domain.getUUIDString());
         map.put("name", domain.getName());
         map.put("autostart", domain.getAutostart());
@@ -301,19 +302,21 @@ public class KvmService {
      * @return
      * @throws LibvirtException
      */
-    public Result<Domain> getDomainbyId(Host host, String uuid) {
+    public Result<Map<String, Object>> getDomainByUuid(Host host, String uuid) {
         KvmConnectionProvider connectionProvider = KvmMultipleConnFactory.getKvmConnect(host.getIp());
         Connect connect = connectionProvider.getConnection();
         Domain domain = null;
+        Map<String, Object> map = null;
         try {
             domain = connect.domainLookupByUUIDString(uuid);
+             map = getMap(domain,host.getId());
         } catch (LibvirtException e) {
             e.printStackTrace();
             connectionProvider.returnConnection(connect);
         } finally {
             connectionProvider.returnConnection(connect);
         }
-        return RetResponse.success(domain);
+        return RetResponse.success(map);
     }
 
     /**
@@ -438,27 +441,32 @@ public class KvmService {
             switch (option) {
                 case "reboot": {
                     domain.reboot(0);
+                    break;
                 }
                 case "shutdown": {
                     domain.shutdown();
+                    break;
                 }
                 case "start": {
                     domain.create();
+                    break;
                 }
                 //  强制断电
                 case "destroy": {
                     domain.destroy();
+                    break;
                 }
                 //  挂起
                 case "suspend": {
                     domain.suspend ();
+                    break;
                 }
                 //  恢复挂起
                 case "resume": {
                     domain.resume ();
+                    break;
                 }
             }
-            domain.shutdown(); // 强制关机
         } catch (LibvirtException e) {
             log.error(e.getMessage());
         } finally {

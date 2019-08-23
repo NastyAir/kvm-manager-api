@@ -1,13 +1,10 @@
 package com.example.kvmmanger.controller;
 
 import com.example.kvmmanger.common.Result;
-import com.example.kvmmanger.common.contant.RetCode;
-import com.example.kvmmanger.common.exception.BusinessException;
 import com.example.kvmmanger.entity.Host;
 import com.example.kvmmanger.service.HostService;
 import com.example.kvmmanger.service.KvmService;
 import io.swagger.annotations.ApiOperation;
-import org.libvirt.LibvirtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,7 +42,7 @@ public class DomainCtrl {
     ) {
         Host host = hostService.getOne(hostId);
         Result message = null;
-        message = kvmService.getDomainbyId(host, uuid);
+        message = kvmService.getDomainByUuid(host, uuid);
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
@@ -85,9 +82,21 @@ public class DomainCtrl {
         message = kvmService.undefineDomain(host, uuid);
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
+    @ApiOperation(value = "操作客户机", notes = "", response = ResponseEntity.class, tags = {"domain"})
+    @PutMapping("/action")
+    public ResponseEntity action(
+            @RequestParam Integer hostId,
+            @RequestParam String uuid,
+            @RequestParam String action
+    ) {
+        Host host = hostService.getOne(hostId);
+        Result message = null;
+        message = kvmService.domainAction(host, uuid, action);
+        return new ResponseEntity<>(message, HttpStatus.OK);
+    }
 
     @ApiOperation(value = "开启客户机", notes = "", response = ResponseEntity.class, tags = {"domain"})
-    @PutMapping()
+    @PutMapping("/start")
     public ResponseEntity start(
             @RequestParam Integer hostId,
             @RequestParam String uuid
@@ -99,7 +108,7 @@ public class DomainCtrl {
     }
 
     @ApiOperation(value = "关闭客户机", notes = "", response = ResponseEntity.class, tags = {"domain"})
-    @PutMapping()
+    @PutMapping("/shutdown")
     public ResponseEntity shutdown(
             @RequestParam Integer hostId,
             @RequestParam String uuid
@@ -111,7 +120,7 @@ public class DomainCtrl {
     }
 
     @ApiOperation(value = "重启客户机", notes = "", response = ResponseEntity.class, tags = {"domain"})
-    @PutMapping()
+    @PutMapping("/reboot")
     public ResponseEntity reboot(
             @RequestParam Integer hostId,
             @RequestParam String uuid
@@ -123,7 +132,7 @@ public class DomainCtrl {
     }
 
     @ApiOperation(value = "关闭客户机电源", notes = "", response = ResponseEntity.class, tags = {"domain"})
-    @PutMapping()
+    @PutMapping("/destroy")
     public ResponseEntity destroy(
             @RequestParam Integer hostId,
             @RequestParam String uuid
@@ -135,7 +144,7 @@ public class DomainCtrl {
     }
 
     @ApiOperation(value = "挂起客户机", notes = "", response = ResponseEntity.class, tags = {"domain"})
-    @PutMapping()
+    @PutMapping("/suspend")
     public ResponseEntity suspend(
             @RequestParam Integer hostId,
             @RequestParam String uuid
@@ -147,7 +156,7 @@ public class DomainCtrl {
     }
 
     @ApiOperation(value = "恢复客户机", notes = "", response = ResponseEntity.class, tags = {"domain"})
-    @PutMapping()
+    @PutMapping("/resume")
     public ResponseEntity resume(
             @RequestParam Integer hostId,
             @RequestParam String uuid

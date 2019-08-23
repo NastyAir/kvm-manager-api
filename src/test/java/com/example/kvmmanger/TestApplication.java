@@ -513,7 +513,7 @@ public class TestApplication {
 //        application.getStorageVolumebyName("virtimage01","kvmdemo.qcow2");
 //        application.deleteStorageVolume("virtimage01","kvmdemo.qcow2");
 //        application.listDomain();
-//        application.getDomainbyId(3);
+//        application.getDomainByUuid(3);
 //        application.createDomain();
 
     }
