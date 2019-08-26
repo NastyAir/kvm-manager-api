@@ -39,7 +39,7 @@ public class FileUploadUtils {
             throw new BusinessException(RetCode.FAIL, "非法路径");
         }
         File filePath = new File(storePath);
-        File file = new File(filePath + "/" + filename);
+        File file = new File(filePath + File.separator + filename);
         if (file.exists()) { //判断文件父目录是否存在
             String fileType = filename.substring(filename.lastIndexOf(".") + 1);
             if (StringUtils.equalsIgnoreCase(fileType, "jpg")) {
