@@ -14,13 +14,9 @@ public class FileUploadUtils {
         String suffixName = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
         String fileName = "file" + UUID.randomUUID() + suffixName;
         return uploadFile(file, storePath, fileName);
-//        File filePath = new File(storePath);
-//        if (!filePath.exists()){
-//            filePath.mkdirs();
-//        }
-//        File dest = new File(filePath + "/" + fileName);
-//        file.transferTo(dest);
-//        return fileName;
+    }
+    public static String uploadFileOriginal(MultipartFile file, String storePath) throws IOException {
+        return uploadFile(file, storePath, file.getOriginalFilename());
     }
 
     public static String uploadFile(MultipartFile file, String storePath, String fileName) throws IOException {

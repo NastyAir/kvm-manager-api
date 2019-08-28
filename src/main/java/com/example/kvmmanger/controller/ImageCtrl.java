@@ -35,7 +35,7 @@ public class ImageCtrl {
             return new ResponseEntity<>(RetResponse.error("上传失败，请选择文件"), HttpStatus.OK);
         }
         try {
-            String fileName = FileUploadUtils.uploadFile(file, filePath);
+            String fileName = FileUploadUtils.uploadFileOriginal(file, filePath);
             return new ResponseEntity<>(RetResponse.success(fileName), HttpStatus.OK);
         } catch (IOException e) {
             log.error(e.toString(), e);
@@ -57,7 +57,12 @@ public class ImageCtrl {
     public ResponseEntity<Result<Object>> deleteFile(@RequestParam String filename,
                                                      HttpServletResponse response) {
         File file = new File(filePath + File.separator + filename);
-        boolean isSuccess = file.delete();
+        boolean isSuccess;
+        if (file.exists()) {
+            isSuccess = file.delete();
+        } else {
+            throw new BusinessException(RetCode.RECORD_NOT_FOUND);
+        }
         return new ResponseEntity<>(RetResponse.make(isSuccess), HttpStatus.OK);
     }
 

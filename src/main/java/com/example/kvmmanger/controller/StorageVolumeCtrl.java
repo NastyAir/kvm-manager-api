@@ -35,7 +35,7 @@ public class StorageVolumeCtrl {
         Host host = hostService.getOne(hostId);
         Result message = null;
         try {
-            message = kvmService.listStorageVolume(host,poolName);
+            message = kvmService.listStorageVolume(host, poolName);
         } catch (LibvirtException e) {
             e.printStackTrace();
             throw new BusinessException(RetCode.FAIL, "连接KVM异常，获取信息失败");
@@ -53,7 +53,7 @@ public class StorageVolumeCtrl {
         Host host = hostService.getOne(hostId);
         Result message = null;
         try {
-            message = kvmService.getStorageVolumebyName(host, poolName,volumeName);
+            message = kvmService.getStorageVolumebyName(host, poolName, volumeName);
         } catch (LibvirtException e) {
             e.printStackTrace();
             throw new BusinessException(RetCode.FAIL, "连接KVM异常，获取信息失败");
@@ -61,7 +61,7 @@ public class StorageVolumeCtrl {
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
-    @ApiOperation(value = "创建存储卷（临时）", notes = "", response = ResponseEntity.class, tags = {"storageVolume"})
+    @ApiOperation(value = "创建存储卷", notes = "", response = ResponseEntity.class, tags = {"storageVolume"})
     @PostMapping
     public ResponseEntity add(
             @RequestParam Integer hostId,
@@ -70,12 +70,7 @@ public class StorageVolumeCtrl {
     ) {
         Host host = hostService.getOne(hostId);
         Result message = null;
-        try {
-            message = kvmService.createStorageVolume(host,poolName, xmlDesc);
-        } catch (LibvirtException e) {
-            e.printStackTrace();
-            throw new BusinessException(RetCode.FAIL, "连接KVM异常，获取信息失败");
-        }
+        message = kvmService.createStorageVolume(host, poolName, xmlDesc);
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
@@ -89,7 +84,7 @@ public class StorageVolumeCtrl {
     ) {
         Host host = hostService.getOne(hostId);
         Result message = null;
-        message = kvmService.cloneStorageVolume(host,poolName,volumeName, xmlDesc);
+        message = kvmService.cloneStorageVolume(host, poolName, volumeName, xmlDesc);
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
@@ -103,7 +98,7 @@ public class StorageVolumeCtrl {
         Host host = hostService.getOne(hostId);
         Result message = null;
         try {
-            message = kvmService.deleteStorageVolume(host, poolName,volumeName);
+            message = kvmService.deleteStorageVolume(host, poolName, volumeName);
         } catch (LibvirtException e) {
             e.printStackTrace();
             throw new BusinessException(RetCode.FAIL, "连接KVM异常，获取信息失败");

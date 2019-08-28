@@ -37,6 +37,7 @@ public class KvmConnectionFactory extends BasePooledObjectFactory<Connect> {
                 isConnected = connect.isConnected();
             } catch (LibvirtException e) {
                 e.printStackTrace();
+                throw new RuntimeException("validateObject出现异常", e);
             }
         }
         return isConnected;
