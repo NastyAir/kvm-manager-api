@@ -74,6 +74,7 @@ public class HostCtrl {
         Result message = hostService.del(id);
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
+
     @ApiOperation(value = "批量删除主机", notes = "", response = ResponseEntity.class, tags = {"host"})
     @DeleteMapping("/batch")
     public ResponseEntity batchDel(@NotBlank(message = "id不能为空") @RequestParam Integer[] ids) {
@@ -81,7 +82,7 @@ public class HostCtrl {
         List<Integer> failList = new ArrayList<>();
         for (Integer id : ids) {
             if (id != null) {
-                ResponseEntity  responseEntity = del(id);
+                ResponseEntity responseEntity = del(id);
                 if (((Result) responseEntity.getBody()).isSuccess()) {
                     successList.add(id);
                 } else {

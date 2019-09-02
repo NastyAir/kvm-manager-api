@@ -72,10 +72,10 @@ public class DomainCtrl {
     }
 
     @ApiOperation(value = "删除客户机", notes = "", response = ResponseEntity.class, tags = {"domain"})
-    @DeleteMapping()
+    @DeleteMapping("/{uuid}/host/{hostId}")
     public ResponseEntity del(
-            @RequestParam Integer hostId,
-            @RequestParam String uuid
+            @PathVariable Integer hostId,
+            @PathVariable String uuid
     ) {
         Host host = hostService.getOne(hostId);
         Result message = null;

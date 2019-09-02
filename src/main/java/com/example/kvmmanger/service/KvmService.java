@@ -23,6 +23,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
+import static org.libvirt.DomainInfo.DomainState.VIR_DOMAIN_RUNNING;
+
 @Service
 @Slf4j
 public class KvmService {
@@ -435,7 +437,9 @@ public class KvmService {
         Domain domain = null;
         try {
             domain = connect.domainLookupByUUIDString(uuid);
-            domain.destroy(); // 强制关机
+            if (domain.getInfo().state == VIR_DOMAIN_RUNNING) {
+                domain.destroy(); // 强制关机
+            }
             domain.undefine();
         } catch (LibvirtException e) {
             log.error(e.getMessage());
@@ -472,6 +476,7 @@ public class KvmService {
                     }
                     String line = uuid + ": " + host.getIp() + ":" + vncPort;
                     writeToken(Collections.singletonList(line), uuid);
+                    break;
                 }
                 //  强制断电
                 case "destroy": {

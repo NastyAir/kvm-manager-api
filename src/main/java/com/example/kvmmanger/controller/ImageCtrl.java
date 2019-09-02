@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotBlank;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -54,8 +55,7 @@ public class ImageCtrl {
 
     @DeleteMapping("/file")
     @ApiOperation(value = "文件删除", notes = "", response = ResponseEntity.class, tags = {"image"})
-    public ResponseEntity<Result<Object>> deleteFile(@RequestParam String filename,
-                                                     HttpServletResponse response) {
+    public ResponseEntity<Result<Object>> deleteFile(@RequestParam String filename) {
         File file = new File(filePath + File.separator + filename);
         boolean isSuccess;
         if (file.exists()) {
@@ -65,7 +65,27 @@ public class ImageCtrl {
         }
         return new ResponseEntity<>(RetResponse.make(isSuccess), HttpStatus.OK);
     }
-
+    @ApiOperation(value = "批量删除文件", notes = "", response = ResponseEntity.class, tags = {"image"})
+    @DeleteMapping("/file/batch")
+    public ResponseEntity batchDel(@NotBlank(message = "id不能为空") @RequestParam String [] fileNames) {
+        List<String> successList = new ArrayList<>();
+        List<String> failList = new ArrayList<>();
+        for (String fileName : fileNames) {
+            if (fileName != null) {
+                ResponseEntity  responseEntity = deleteFile(fileName);
+                if (((Result) responseEntity.getBody()).isSuccess()) {
+                    successList.add(fileName);
+                } else {
+                    failList.add(fileName);
+                }
+            }
+        }
+        StringBuilder stringBuilder = new StringBuilder("删除成功" + successList.size() + "个\n");
+        if (failList.size() > 0) {
+            stringBuilder.append("删除失败").append(failList.size()).append("个。");
+        }
+        return new ResponseEntity<>(RetResponse.success(stringBuilder.toString()), HttpStatus.OK);
+    }
     @GetMapping("/treeList")
     @ApiOperation(value = "镜像树型列表", notes = "", response = ResponseEntity.class, tags = {"image"})
     public ResponseEntity<Result<List<String>>> treeList() {
