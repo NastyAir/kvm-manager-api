@@ -370,6 +370,7 @@ public class KvmService {
         Domain domain = null;
         String uuid;
         String vncPort;
+        Map<String, Object> dataMap;
         try {
             domain = connect.domainDefineXML(xmlDesc);
             // 是否随宿主机开机自动启动
@@ -378,6 +379,7 @@ public class KvmService {
 
             uuid = domain.getUUIDString();
             vncPort = getVncPort(uuid, connect);
+            dataMap = getMap(domain, host.getId());
         } catch (LibvirtException e) {
             log.error(e.getMessage());
             throw new BusinessException(RetCode.FAIL);
@@ -386,7 +388,7 @@ public class KvmService {
         }
         String line = uuid + ": " + host.getIp() + ":" + vncPort;
         writeToken(Collections.singletonList(line), uuid);
-        return RetResponse.success(domain);
+        return RetResponse.success(dataMap);
     }
 
     private static String getVncPort(String uuid, Connect connect) {
